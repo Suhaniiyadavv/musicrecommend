@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommended Songs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #007bff;
+        }
+        .song-list {
+            list-style: none;
+            padding: 0;
+        }
+        .song-list li {
+            margin: 10px 0;
+        }
+        .song-list a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .song-list a:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recommended Songs</h1>
+    <p>Your mood: <span id="mood"></span></p>
+    <ul id="songList" class="song-list"></ul>
+    <button class="back-button" onclick="goBack()">Select Another Mood</button>
+
+    <script>
+        // Store songs and their Spotify URLs
+        const songsDatabase = {
+            happy: [
+                { name: "APT. - ROSÉ", url: "https://open.spotify.com/track/3Vi5XqYrmQgOYBajMWSvCi" },
+                { name: "Move Your Body - Life in Polaroid", url: "https://open.spotify.com/track/3kxfsdsCpFgN412fpnW85Y" },
+                { name: "Shut Up and Dance - WALK THE MOON", url: "https://open.spotify.com/track/4kbj5MwxO1bq9wjT5g9HaA" },
+                { name: "Abracadabra - Lady Gaga", url: "https://open.spotify.com/track/5nujrmhLynf4yMoMtj8AQF" },
+                { name: "NO BAD DAYS (feat. Collett) - Macklemore", url: "https://open.spotify.com/track/5RqR4ZCCKJDcBLIn4sih9l" }
+            ],
+            sad: [
+                { name: "Someone Like You - Adele", url: "https://open.spotify.com/track/4iJyoBOLtHqaGxP12qzhQI" },
+                { name: "Fix You - Coldplay", url: "https://open.spotify.com/track/7LVHVU3tWfcxj5aiPFEW4Q" },
+                { name: "Lose You to Love Me - Selena Gomez", url: "https://open.spotify.com/track/7Dt6x5M1jzdTEt8oCbisTK" },
+                { name: "Let Her Go - Passenger", url: "https://open.spotify.com/track/3ZFTkvIE7kyPt6Nu3PEa7V" },
+                { name: "When We Were Young - Adele", url: "https://open.spotify.com/track/4Pghdm0E2UxU1icOjZ3IM2" }
+            ],
+            excited: [
+                { name: "Uptown Funk - Mark Ronson ft. Bruno Mars", url: "https://open.spotify.com/track/32OlwWuMpZ6b0aN2RZOeMS" },
+                { name: "Can't Stop the Feeling - Justin Timberlake", url: "https://open.spotify.com/track/6JV2JOEocMgcZxYSZelKcc" },
+                { name: "On Top of the World - Imagine Dragons", url: "https://open.spotify.com/track/2uE43K0hhXOhro9Dl7Z8IE" },
+                { name: "Firework - Katy Perry", url: "https://open.spotify.com/track/6L89mwZXSOwYl76YXfX13s" },
+                { name: "Roar - Katy Perry", url: "https://open.spotify.com/track/2xLOMHjkOK8nzxJ4r6yOKR" }
+            ],
+            relaxed: [
+                { name: "Better Together - Jack Johnson", url: "https://open.spotify.com/track/2L9iH3XYWl3E77S5uY7HE1" },
+                { name: "Gravity - John Mayer", url: "https://open.spotify.com/track/4eHbdreAnSOrDDsFfc4Fpm" },
+                { name: "Banana Pancakes - Jack Johnson", url: "https://open.spotify.com/track/2wwOsrkGpBA0nsl2XKf3pn" },
+                { name: "Photograph - Ed Sheeran", url: "https://open.spotify.com/track/1HNkqx9Ahdgi1Ixy2xkKkL" },
+                { name: "Bloom - The Paper Kites", url: "https://open.spotify.com/track/0DXu8VZ8TR6kJjq0LG6IS6" }
+            ],
+            angry: [
+                { name: "Stronger - Kanye West", url: "https://open.spotify.com/track/5BIMPccDwShpXq784RJlJp" },
+                { name: "Break Stuff - Limp Bizkit", url: "https://open.spotify.com/track/4JrjSU8n4WDn5L4vVwTPQH" },
+                { name: "The Way I Am - Eminem", url: "https://open.spotify.com/track/2TAaHlD0Kze0hBNe9g1Z6b" },
+                { name: "Given Up - Linkin Park", url: "https://open.spotify.com/track/7M40viAeIlFUDzUjUCoT0M" },
+                { name: "Before I Forget - Slipknot", url: "https://open.spotify.com/track/2GOU4D4y8pcSRLy5G3p6Eh" }
+            ]
+        };
+
+        // Get mood from local storage
+        const selectedMood = localStorage.getItem("selectedEmotion") || "happy";
+        document.getElementById("mood").innerText = selectedMood.charAt(0).toUpperCase() + selectedMood.slice(1);
+
+        // Populate songs list
+        const songList = document.getElementById("songList");
+        songsDatabase[selectedMood].forEach(song => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = song.url;
+            a.textContent = song.name;
+            a.target = "_blank"; // Opens link in new tab
+            li.appendChild(a);
+            songList.appendChild(li);
+        });
+
+        // Go back function
+        function goBack() {
+            window.location.href = "recommendations.html"; // Change to your recommendations page
+        }
+    </script>
+</body>
+</html>
